@@ -2,9 +2,10 @@
     "twilio": {
         "account_sid" : "AXX"
         , "auth_token" : "YYY"
+        , "sent_from_number": "+XXXXXXXXXX"
     }
     , "mongo": {
-        "dbName": "never-forget"
+        "dbName": "never"
         , "port": 11111 
         , "host": "localhost"
     }
