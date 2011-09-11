@@ -95,7 +95,7 @@ def worker(config):
                 db['messages'].insert(m)
 
         
-        time.sleep(5)
+        time.sleep(10)
 
 
 def convert_sms_input_to_seconds(specified_time):
