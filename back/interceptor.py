@@ -8,6 +8,8 @@ import sys
 import simplejson as json
 import threading
 
+import pymongo
+
 from twilio.rest import TwilioRestClient
 # load up a config file that contains an API key
 
@@ -72,8 +74,26 @@ def worker(config):
                     , 'date_created_seconds': date_created_seconds
                     , 'calculated_reply_time': calculated_reply_time
                     , 'interpreted_time': specified_time
-                    , 'message': specified_message 
+                    , 'message': specified_message.strip()
+                    , 'was_sent': False
                 })
+        
+        
+        # check to see if we've already added this message to mongo, yikes..
+        cxn = pymongo.Connection(config['mongo']['host'], int(config['mongo']['port']))
+        db = cxn[config['mongo']['dbName']]
+        for m in messages:
+            # if sid not in place, insert into mongo
+            query = {'sid': m['sid']}
+            returnFields = {'_id': True}
+            
+            matchingDocs = list(db['messages'].find(query, returnFields).limit(1))
+            if matchingDocs:
+                # already got it
+                continue
+            else:
+                db['messages'].insert(m)
+
         
         time.sleep(5)
 
