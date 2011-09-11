@@ -43,20 +43,64 @@ def worker(config):
     ''' gets threaded..scrapes the twilio sms messages
     '''
     thread_print('starting thread')
-    
     client = TwilioRestClient(config['twilio']['account_sid'], config['twilio']['auth_token'])
 
-    
     while(1):
-        print dir(client.sms.messages)
-
+        messages = []
         for message in client.sms.messages.list():
             if message.direction == 'inbound':
-                print message.body
-                print message.from_
+                # or maybe it's: 'oh hai %1d 3h 5m'
+                chunks = message.body.split('%')
+                if len(chunks) != 2: 
+                    print 'punt'
+                    continue   # best punter
+
+                specified_message = chunks[0]
+                specified_time = chunks[1]
+                seconds_till_blastoff = convert_sms_input_to_seconds(specified_time)
+                print '\n\n'
+                print 'incoming: %s' % specified_time 
+                print 'seconds: %d' % seconds_till_blastoff
+
+                date_created_seconds = time.mktime(time.strptime(message.date_created, '%a, %d %b %Y %H:%M:%S +0000'))
+                calculated_reply_time = date_created_seconds + seconds_till_blastoff
+
+                messages.append({
+                    'body': message.body
+                    , 'from': message.from_
+                    , 'sid': message.sid
+                    , 'date_created_seconds': date_created_seconds
+                    , 'calculated_reply_time': calculated_reply_time
+                    , 'interpreted_time': specified_time
+                    , 'message': specified_message 
+                })
         
         time.sleep(5)
-    
+
+
+def convert_sms_input_to_seconds(specified_time):
+    '''convert an input: 1d 3h 5m
+    '''
+    specified_time.strip()
+    chunks = specified_time.split()
+    days, hours, minutes = None, None, None
+    for chunk in chunks:
+
+        if chunk.find('d') != -1:
+            days = int(chunk[0:-1])   # all but the letter
+        elif chunk.find('h') != -1:
+            hours = int(chunk[0:-1])
+        elif chunk.find('m') != -1:
+            minutes = int(chunk[0:-1])
+    seconds = 0
+    if days:
+        seconds += days*24.*60.*60
+    if hours:
+        seconds += hours*60.*60.
+    if minutes:
+        seconds += minutes*60.
+    return seconds
+
 
 def thread_print(message):
     _now = time.strftime('%a, %d %b %Y %H:%M:%S', time.localtime())
