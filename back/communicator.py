@@ -9,7 +9,6 @@ import simplejson as json
 import threading
 
 import pymongo
-
 from twilio.rest import TwilioRestClient
 # load up a config file that contains an API key
 
@@ -19,7 +18,7 @@ def main():
     check_arg_validity(parser, opts)    # check that the args are valid; will exit and print usage if not
 
 
-    # import config file with info on mongo connections, redwood clusters, and remotes
+    # import config file with info on mongo connections and auth and whatnot
     f = open(opts._pathToConfig, 'r')
     config = json.loads(f.read())
     f.close()
@@ -47,23 +46,23 @@ def worker(config):
     thread_print('starting thread')
     client = TwilioRestClient(config['twilio']['account_sid'], config['twilio']['auth_token'])
 
+    cxn = pymongo.Connection(config['mongo']['host'], int(config['mongo']['port']))
+    db = cxn[config['mongo']['dbName']]
     while(1):
-        
-        cxn = pymongo.Connection(config['mongo']['host'], int(config['mongo']['port']))
-        db = cxn[config['mongo']['dbName']]
-
-        #query = {'$and': [{'was_sent': False}, {'calculated_reply_time': {'$lte': time.time()}}]} 
-        #query = {'was_sent': False, 'calculated_reply_time': {'$lte': time.time()}}
-        query = {'was_sent': False}
+        # find all the messages that haven't been sent and are marked to be sent at a time earlier than now
+        query = {'$and': [{'was_sent': False}, {'calculated_reply_time': {'$lte': time.mktime(time.gmtime())}} ]} 
         returnFields = {'_id': False}
 
         unsentMessages = list(db['messages'].find(query, returnFields))
         print unsentMessages
         for m in unsentMessages:
+            print m['calculated_reply_time'] - time.mktime(time.gmtime())
+            
             sent_message = client.sms.messages.create(
                             to = m['from']
                             , from_ = config['twilio']['sent_from_number']
                             , body = m['message'])
+            
 
             # flip that bit
             query = {'sid': m['sid']}
@@ -71,7 +70,6 @@ def worker(config):
             db['messages'].update(query, {'$set': {'was_sent': True}})
         
         time.sleep(10)
-
 
 
 def thread_print(message):

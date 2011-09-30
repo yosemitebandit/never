@@ -8,16 +8,17 @@ smstimecapsule
 receiver takes an incoming text and stores it in mongo
 
 ### mongo
-  created: timestamp
-  resent: bool
-  message: text n stuff
-  send_at_this_time: timestamp
+ - created: timestamp
+ - resent: bool
+ - message: text n stuff
+ - send_at_this_time: timestamp
 
 starting: /usr/bin/mongod --fork --logpath /var/log/mongodb/mongodb.log --logappend --port 12345 --bind_ip 127.0.0.1
+double check your mongo version; gotta have 2.0
 
 
 ### twilio..come on man
-{
+  {
     'body': 'whattup',
     'status': 'sent',
     'direction': 'outbound-reply',
@@ -34,7 +35,7 @@ starting: /usr/bin/mongod --fork --logpath /var/log/mongodb/mongodb.log --logapp
     'date_created': 'Sun,11Sep201113:46:48+0000',
     'from_': '+bla',
     'api_version': '2010-04-01'
-}
+  }
 
 fyi, you can GET things like https://api.twilio.com/2010-04-01/Accounts/[APP-ID-HERE]/SMS/Messages.json?pages=2
 and sign in with your app ID and secret
