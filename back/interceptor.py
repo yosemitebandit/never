@@ -6,7 +6,6 @@ import optparse
 import time
 import sys
 import simplejson as json
-import threading
 
 import pymongo
 from twilio.rest import TwilioRestClient
@@ -21,47 +20,27 @@ def main():
     f = open(opts._pathToConfig, 'r')
     config = json.loads(f.read())
     f.close()
-        
-    # start a thread for each cluster's scraper;  maybe add more later
-    threadPool = {}
-    key = 'thread1'
-    threadPool[key] = threading.Thread(target=worker, args=(config,))
-    threadPool[key].start()
-    
-    # continuously check that the threads are still kicking
-    while(1):   
-        for key in threadPool:
-            if not threadPool[key].is_alive():
-                thread_print('*error, restarting %s thread' % key)
-                threadPool[key] = threading.Thread(target=worker, args=(config,))
-                threadPool[key].start()
 
-        time.sleep(10)
-
-def worker(config):
-    ''' gets threaded..scrapes the twilio sms messages
-    '''
-    thread_print('starting thread')
     client = TwilioRestClient(config['twilio']['account_sid'], config['twilio']['auth_token'])
 
     while(1):
         messages = []
-        print client.sms.messages.count()
+        formatted_print('client messages count: %d' % client.sms.messages.count())
         for message in client.sms.messages.list():
             if message.direction == 'inbound':
                 # or maybe it's: 'oh hai %1d 3h 5m'
                 chunks = message.body.split('%')
                 if len(chunks) != 2:
-                    print 'punt -- %s' % message.body
+                    formatted_print('punt -- %s' % message.body)
                     continue   # best punter
 
                 specified_message = chunks[0]
                 specified_time = chunks[1]
                 seconds_till_blastoff = convert_sms_input_to_seconds(specified_time)
-                print 'message body: %s' % message.body
+                formatted_print('message body: %s' % message.body)
 
                 date_created_seconds = time.mktime(time.strptime(message.date_created, '%a, %d %b %Y %H:%M:%S +0000'))
-                # send it back at this time:
+                # send it back at this time
                 calculated_reply_time = date_created_seconds + seconds_till_blastoff
                 
                 # the mongo holding cell
@@ -128,7 +107,7 @@ def convert_sms_input_to_seconds(specified_time):
     return seconds
 
 
-def thread_print(message):
+def formatted_print(message):
     _now = time.strftime('%a, %d %b %Y %H:%M:%S', time.localtime())
     sys.stdout.write(_now + ' - ' + message + '\n')
 

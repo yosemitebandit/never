@@ -1,11 +1,26 @@
 ## never
-never forget this text
-cause I send it to you again
-yeah.
-smstimecapsule
+never forget this text; cause I send it to you again. better name: smstimecapsule
 
-## back
-receiver takes an incoming text and stores it in mongo
+
+### go-time
+ - start mongo:
+
+  mongod --fork --logpath /var/log/mongodb/mongodb.log --logappend --port 12345 --bind_ip 127.0.0.1
+
+ - use supervisor to start the interceptor process, this gathers up the texts and stores them in mongo
+ - use supervisor to start the communicator process, this is a little cron-ish job that sends back the texts
+
+
+### setup
+ - make a virtualenv and install some dependencies
+
+    $ virtualenv --no-site-packages ~/virtualenvs/never-lib
+    $ pip install -E ~/virtualenvs/never-lib pymongo 
+    $ pip install -E ~/virtualenvs/never-lib twilio
+
+ - move the supervisord config file somewhere safe, edit it to your satisfaction
+ - move the never config file somewhere safe, edit it to your satisfaction
+
 
 ### mongo
  - created: timestamp
@@ -13,7 +28,6 @@ receiver takes an incoming text and stores it in mongo
  - message: text n stuff
  - send_at_this_time: timestamp
 
-starting: /usr/bin/mongod --fork --logpath /var/log/mongodb/mongodb.log --logappend --port 12345 --bind_ip 127.0.0.1
 double check your mongo version; gotta have 2.0
 
 
@@ -37,6 +51,8 @@ double check your mongo version; gotta have 2.0
     'api_version': '2010-04-01'
   }
 
-fyi, you can GET things like https://api.twilio.com/2010-04-01/Accounts/[APP-ID-HERE]/SMS/Messages.json?pages=2
-and sign in with your app ID and secret
+ - fyi, you can GET things like https://api.twilio.com/2010-04-01/Accounts/[APP-ID-HERE]/SMS/Messages.json?pages=2
+   - sign in with your app ID and secret
+   - so maybe it would be better to forgo the python lib and use requests
+   - pagination seems broken in the python lib
 

@@ -6,7 +6,6 @@ import optparse
 import time
 import sys
 import simplejson as json
-import threading
 
 import pymongo
 from twilio.rest import TwilioRestClient
@@ -17,33 +16,11 @@ def main():
     (opts, args) = parser.parse_args()
     check_arg_validity(parser, opts)    # check that the args are valid; will exit and print usage if not
 
-
     # import config file with info on mongo connections and auth and whatnot
     f = open(opts._pathToConfig, 'r')
     config = json.loads(f.read())
     f.close()
-
         
-    # start a thread for each cluster's scraper;  maybe add more later
-    threadPool = {}
-    key = 'thread1'
-    threadPool[key] = threading.Thread(target=worker, args=(config,))
-    threadPool[key].start()
-    
-    # continuously check that the threads are still kicking
-    while(1):   
-        for key in threadPool:
-            if not threadPool[key].is_alive():
-                thread_print('*error, restarting %s thread' % key)
-                threadPool[key] = threading.Thread(target=worker, args=(config,))
-                threadPool[key].start()
-
-        time.sleep(10)
-
-def worker(config):
-    ''' gets threaded.. sends the saved twilio messages
-    '''
-    thread_print('starting thread')
     client = TwilioRestClient(config['twilio']['account_sid'], config['twilio']['auth_token'])
 
     cxn = pymongo.Connection(config['mongo']['host'], int(config['mongo']['port']))
@@ -72,7 +49,7 @@ def worker(config):
         time.sleep(10)
 
 
-def thread_print(message):
+def formatted_print(message):
     _now = time.strftime('%a, %d %b %Y %H:%M:%S', time.localtime())
     sys.stdout.write(_now + ' - ' + message + '\n')
 
