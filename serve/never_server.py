@@ -129,9 +129,9 @@ def _convert_delay_to_seconds(message):
             seconds += int(part[0:-1])                                        
     
     if days:                                                                   
-        seconds += days*24.*60.*60                                             
+        seconds += days*24*60*60.                                             
     if hours:                                                                  
-        seconds += hours*60.*60.                                               
+        seconds += hours*60*60.                                               
     if minutes:                                                                
         seconds += minutes*60.                                                 
     return seconds  
