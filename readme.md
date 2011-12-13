@@ -33,12 +33,14 @@ this should really be called 'smstimecapsule'
 
 
 ### should-fix
- - apscheduler doesn't like UTC - that's why the messages are late
  - mongo jobstore so jobs persist
  - flesh out the twilio setup section above
  - better error-handling..it's always better error-handling
+ - test s,m,h,d
+ - add a fabfile
 
 
 ### would-be-nice
  - get a random text from your past sends
- - send/receive from different numbers
+ - preamble that says when the message was sent?
+ - twilio takes a few seconds to send the text -- account for this offset?
