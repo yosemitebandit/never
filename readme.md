@@ -34,6 +34,7 @@ this should really be called 'smstimecapsule'
 
 ### should-fix
  - apscheduler doesn't like UTC - that's why the messages are late
+ - mongo jobstore so jobs persist
  - flesh out the twilio setup section above
  - better error-handling..it's always better error-handling
 
