@@ -24,7 +24,7 @@ connect(app.config['MONGO']['db_name']
     , port=int(app.config['MONGO']['port']))
 
 # start the logger
-logging.basicConfig(filename='/tmp/sch.log'
+logging.basicConfig(filename=app.config['LOG_FILE']
     , level=logging.DEBUG
     , format='%(levelname)s[%(asctime)s]: %(message)s')
 
@@ -56,7 +56,7 @@ def incoming_sms():
 
         # save the sms in mongo
         try: 
-            sms = SMS_Message(
+            sms = Message(
                 body = flask.request.form['Body']
                 , has_been_resent = False
                 , received_at = datetime.datetime.utcnow()
@@ -71,8 +71,7 @@ def incoming_sms():
             flask.abort(400)
 
         # schedule the sms to be sent at some time
-        job = scheduler.add_date_job(scheduled_sms_send, sms.resend_at, [sms.id])
-        print job
+        scheduler.add_date_job(scheduled_sms_send, sms.resend_at, [sms.id])
 
         return flask.render_template('incoming_sms_reply.xml')
 
@@ -83,7 +82,11 @@ def scheduled_sms_send(message_id):
     ''' scheduler calls this function to send out a specific message
     '''
     # query for the message
-    message = SMS_Message.objects(id=message_id)[0]
+    message = Message.objects(id=message_id)
+    if not message:
+        flask.abort(404)
+    else:
+        message = message[0]
     # strip out the specified delay from the body
     last_percent = len(message.body) - message.body[::-1].find(delimiter)
     outgoing_body = message.body[0:last_percent - 1]
@@ -149,7 +152,7 @@ def _convert_delay_to_seconds(message):
 
 ''' mongoengine models
 '''
-class SMS_Message(Document):
+class Message(Document):
     ''' messages sent in to the service 
     '''
     body = StringField(required=True)
@@ -161,5 +164,5 @@ class SMS_Message(Document):
 
 
 if __name__ == '__main__':
-    app.run(host=app.config['APP_SERVER']['host']
-        , port=int(app.config['APP_SERVER']['port']))
+    app.run(host=app.config['APP_HOST']
+        , port=int(app.config['APP_PORT']))

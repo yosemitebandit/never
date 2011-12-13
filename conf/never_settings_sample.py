@@ -10,6 +10,7 @@ MONGO = {
 DEBUG = False
 APP_HOST = '127.0.0.1'
 APP_PORT = 8002
+LOG_FILE = '/path/to/log/file'
 
 # controls some sending/receiving info
 MESSAGING = {
@@ -21,7 +22,7 @@ MESSAGING = {
 
 # gotta have a twilio account
 TWILIO = {
-    'account_sid': 'AXXXXXXXXXX'
-    , 'auth_token': 'YYYYYYYYYY'
-    , 'sent_from_number': '+ZZZZZZZZZZ'
+    'account_sid': 'ACabcdefghijklmnopqrstuvwxyz'
+    , 'auth_token': 'zyxwvutsrqponmlkjihgfedcba'
+    , 'sent_from_number': '+1234567890'
 }
