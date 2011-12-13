@@ -4,6 +4,7 @@ never_server.py
 twilio endpoints and managing the sending of outgoing messages
 '''
 import datetime
+import time
 
 from apscheduler.scheduler import Scheduler
 import flask
@@ -39,7 +40,7 @@ def incoming_sms():
     # calculate when to resend this text
     # extract the delay section, demarcated by the delimiter
     parts = flask.request.form['Body'].split(delimiter)
-    if len(parts < 2):
+    if len(parts) < 2:
         # no delimiter detected
         flask.abort(400)
         # should send some error message back as sms
@@ -66,7 +67,7 @@ def incoming_sms():
         # schedule the sms to be sent at some time
         scheduler.add_date_job(scheduled_sms_send, sms.resend_at, [sms.id])
 
-        flask.render_template('incoming_sms_reply.xml')
+        return flask.render_template('incoming_sms_reply.xml')
 
 
 ''' utilities
