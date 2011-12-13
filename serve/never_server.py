@@ -4,6 +4,7 @@ never_server.py
 twilio endpoints and managing the sending of outgoing messages
 '''
 import datetime
+import logging
 import time
 
 from apscheduler.scheduler import Scheduler
@@ -21,6 +22,11 @@ delimiter = app.config['MESSAGING']['incoming_delimiter']
 connect(app.config['MONGO']['db_name']
     , host=app.config['MONGO']['host']
     , port=int(app.config['MONGO']['port']))
+
+# start the logger
+logging.basicConfig(filename='/tmp/sch.log'
+    , level=logging.DEBUG
+    , format='%(levelname)s[%(asctime)s]: %(message)s')
 
 # start the job scheduler
 scheduler = Scheduler()
@@ -65,7 +71,8 @@ def incoming_sms():
             flask.abort(400)
 
         # schedule the sms to be sent at some time
-        scheduler.add_date_job(scheduled_sms_send, sms.resend_at, [sms.id])
+        job = scheduler.add_date_job(scheduled_sms_send, sms.resend_at, [sms.id])
+        print job
 
         return flask.render_template('incoming_sms_reply.xml')
 
@@ -78,8 +85,8 @@ def scheduled_sms_send(message_id):
     # query for the message
     message = SMS_Message.objects(id=message_id)[0]
     # strip out the specified delay from the body
-    last_percent = len(sms.body) - sms.body[::-1].find(delimiter)
-    outgoing_body = sms.body[0:last_percent - 1]
+    last_percent = len(message.body) - message.body[::-1].find(delimiter)
+    outgoing_body = message.body[0:last_percent - 1]
     # add a preamble..uh, later
     # fire off the message
     result = _send_sms(message.sender, outgoing_body)
@@ -102,8 +109,11 @@ def _send_sms(to, body):
 
     endpoint = 'https://api.twilio.com/2010-04-01/Accounts/%s/SMS/Messages' \
         % app.config['TWILIO']['account_sid']
+    
+    credentials = (app.config['TWILIO']['account_sid']
+        , app.config['TWILIO']['auth_token'])
 
-    r = requests.post(endpoint, data=request)
+    r = requests.post(endpoint, data=request, auth=credentials)
     if r.status_code == 200:
         return True
     else:
