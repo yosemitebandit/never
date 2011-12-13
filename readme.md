@@ -23,13 +23,13 @@ Read more at http://yosemitebandit.com/projects
    - expound..
  - make a virtualenv and install some dependencies
     
-    `
+    ```
     $ virtualenv --no-site-packages /path/to/virtualenvs/never-lib
     $ pip install -E /path/to/virtualenvs/never-lib mongoengine
     $ pip install -E /path/to/virtualenvs/never-lib apscheduler
     $ pip install -E /path/to/virtualenvs/never-lib flask
     $ pip install -E /path/to/virtualenvs/never-lib requests
-    `
+    ```
 
  - copy the sample never settings config file out of the repo and edit it with your settings
  - point an env var to your config file with:
