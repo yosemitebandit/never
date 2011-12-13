@@ -7,10 +7,9 @@ MONGO = {
 }
 
 # flask server parameters
-APP_SERVER = {
-    'host': '127.0.0.1'
-    , 'port': 8002
-}
+DEBUG = False
+APP_HOST = '127.0.0.1'
+APP_PORT = 8002
 
 # controls some sending/receiving info
 MESSAGING = {
