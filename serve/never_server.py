@@ -68,6 +68,7 @@ def incoming_sms():
             sms.save()
         except:
             # something didn't validate
+            logging.error('failed to save sms')
             flask.abort(400)
 
         # schedule the sms to be sent at some time
@@ -117,9 +118,11 @@ def _send_sms(to, body):
         , app.config['TWILIO']['auth_token'])
 
     r = requests.post(endpoint, data=request, auth=credentials)
-    if r.status_code == 200:
+    if r.status_code == 200 or r.status_code == 201:
+        logging.info('successfully sent sms')
         return True
     else:
+        logging.error('failed to send sms')
         return False
 
 
