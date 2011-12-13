@@ -1,6 +1,14 @@
 ## never
-never forget this text, cause I'm gonna send it to you again. 
-this should really be called 'smstimecapsule'
+Send this service a text and, after some amount of time, you'll get the same message back.
+It's an SMS time capsule (formerly known as never-forget-this-text).
+Tell it when to resend the message by adding `%5d 8h 20m 7s` at the end
+and the message will return in five days, eight hours, twenty minutes and seven seconds.
+Not all of those parameters are required - you could just ask for `%7d`
+to see your note-to-self again in a week's time.
+But take care - the spaces between the parameters are required.
+
+This is a Flask app built with Twilio and Mongo.
+Read more at http://yosemitebandit.com/projects
 
 
 ### setup
