@@ -99,7 +99,7 @@ def _send_sms(to, body):
         #, 'StatusCallback': ''  # reports sent/failed
     }
 
-    endpoint = 'https://api.twilio.com/2010-04-01/Accounts/%s/SMS/Messages'
+    endpoint = 'https://api.twilio.com/2010-04-01/Accounts/%s/SMS/Messages' \
         % app.config['TWILIO']['account_sid']
 
     r = requests.post(endpoint, data=request)
@@ -128,11 +128,11 @@ def _convert_delay_to_seconds(message):
             seconds += int(part[0:-1])                                        
     
     if days:                                                                   
-        seconds += days*24.*60.*60                                             
+        seconds += days*24*60*60.                                             
     if hours:                                                                  
-        seconds += hours*60.*60.                                               
+        seconds += hours*60*60.                                               
     if minutes:                                                                
-        seconds += minutes.*60.                                                 
+        seconds += minutes*60.                                                 
     return seconds  
 
 
