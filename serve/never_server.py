@@ -8,6 +8,7 @@ import logging
 import time
 
 from apscheduler.scheduler import Scheduler
+from apscheduler.jobstores.mongodb_store import MongoDBJobStore
 import flask
 from mongoengine import *
 import requests
@@ -28,8 +29,12 @@ logging.basicConfig(filename=app.config['LOG_FILE']
     , level=logging.DEBUG
     , format='%(levelname)s[%(asctime)s]: %(message)s')
 
-# start the job scheduler
+# start the job scheduler with persistent store
 scheduler = Scheduler()
+scheduler.add_jobstore(MongoDBJobStore(
+    database=app.config['MONGO']['db_name']
+    , host=app.config['MONGO']['host']
+    , port=int(app.config['MONGO']['port'])))
 scheduler.start()
 
 
