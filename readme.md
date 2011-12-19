@@ -18,6 +18,8 @@ Read more at http://yosemitebandit.com/projects
 
 
 ### setup
+Here's how to setup your own server to receive and then resend texts:
+
  - you will need a twilio account with a verified phone number
  - point the incoming SMS callback to this app's twilio endpoint
    - expound..
@@ -56,7 +58,7 @@ Read more at http://yosemitebandit.com/projects
 
 
 ### should-fix
- - mongo jobstore so jobs persist
+ - mongo jobstore so jobs persist - test this separately; things are fishy..
  - flesh out the twilio setup section above
  - better error-handling..it's always better error-handling
  - test s,m,h,d
