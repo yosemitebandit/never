@@ -25,14 +25,66 @@
         <h3>A time capsule for your memories.</h3>
         <br />
         <h3>Send text messages to (650) 830-0777 like this:</h3>
-        <h3><code>the sun shown gold, reflecting copper in the receding surf %5d</code></h3>
-        <h3>And, in five days, we'll send you the same words back.</h3>
+        <h3><code id='eg'>the sun shown gold, reflecting copper in the receding surf %5d</code></h3>
+        <h3 id='how-long'>And, in five days, we'll send you the same words back.</h3>
         <br />
         <h3>Promoting your nostalgia since late 2011.</h3>
         <h4><a href='http://yosemitebandit.com/projects#2011'>about</a>&nbsp;&nbsp;|&nbsp;
         <a href='https://github.com/yosemitebandit/never'>github</a></h4>
       </div>
     </div>
+
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
+    <script>
+
+      /* rotate between these example messages 
+      */
+      var messages = [
+        {
+            eg: 'we moved through the oak forest, amidst trees older than any of us would ever be %8d 12h'
+            , how_long: "And, in eight days and twelve hours, we'll send you the same words back."
+        }
+        , {
+            eg: "a band playing in the general store, the woodstove, a clear sky %60d"
+            , how_long: "And, in sixty days, we'll send you the same words back."
+        }
+        , {
+            eg: 'we saw the sea below us, the stone monument, the rolling grass %10h 5m'
+            , how_long: "And, in ten hours and five minutes, we'll send you the same words back."
+        }
+        , {
+            eg: 'the sun shown gold, reflecting copper in the receding surf %5d'
+            , how_long: "And, in five days, we'll send you the same words back."
+        }
+      ];
+
+      var rotation_delay = 10000;
+      var fade_out_delay = 1500;
+      var fade_in_delay = 1000;
+      var rotation_index = 0;
+
+      $(function() {
+        setInterval(function() {
+          rotate_example(rotation_index);
+        
+          rotation_index++;
+          if (rotation_index >= messages.length) {
+            rotation_index = 0;
+          }
+        }, rotation_delay);
+      });
+
+      var rotate_example = function(index) {
+        $('#eg').fadeOut(fade_out_delay, function() {
+          $(this).text(messages[index]['eg']);
+        }).fadeIn(fade_in_delay);
+
+        $('#how-long').fadeOut(fade_out_delay, function() {
+          $(this).text(messages[index]['how_long']);
+        }).fadeIn(fade_in_delay);
+      };
+
+    </script>
 
   </body>
 </html>
